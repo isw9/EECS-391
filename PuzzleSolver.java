@@ -1,8 +1,10 @@
 import java.util.Scanner;
 import java.util.Queue;
 import java.util.Arrays;
+import java.util.Random;
 
 public class PuzzleSolver {
+  public static int[][] puzzle = new int[3][3];
   
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
@@ -32,8 +34,7 @@ public class PuzzleSolver {
     else if (input.startsWith("move")) {
       String direction = words[1];
       if (Arrays.asList("up", "down", "left", "right").contains(direction)) {
-        int[][] puzzle = setState("b12543678");
-        move(direction, puzzle);
+        move(direction);
       }
       else {
         System.out.println("Please enter a valid direction (up, down, left, or right)");
@@ -59,7 +60,6 @@ public class PuzzleSolver {
   public static int[][] setState(String desiredState) {
     desiredState = desiredState.replace('b', '0');
     String[] integersAsText = desiredState.split("");
-    int puzzle[][] = new int[3][3];
     int row = 0;
     int column = 0;
     for (int i = 1; i < integersAsText.length; i++) {
@@ -77,22 +77,28 @@ public class PuzzleSolver {
   }
   
   public static void randomizeState(int randomMoves) {
+    String[] possibleDirections = {"up", "down", "left", "right"};
+    for (int i = 0; i < randomMoves; i++) {
+      String direction = getRandomDirection(possibleDirections);
+      move(direction);
+    }
     System.out.println("Making " + randomMoves + " random moves");
   }
   
-  public static String printState() {
-    System.out.println("Printing State");
-    return "representation of board";
-  }
-  public static String move(String direction, int[][] puzzle) {
+  public static void printState() {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        System.out.print(puzzle[i][j]);
+        System.out.print(puzzle[i][j] + " ");
       }
+      System.out.print("\n");
     }
+  }
+  public static String move(String direction) {
     System.out.println("Moving in the direction of " + direction);
-    int column = findBlankColumn(puzzle);
-    int row = findBlankRow(puzzle);
+    int column = findBlankColumn();
+    int row = findBlankRow();
+    System.out.println("row is: " + row);
+    System.out.println("column is: " + column);
     if (direction.equals("up")) {
       if (row == 1 || row == 2) {
         puzzle[row][column] = puzzle[row-1][column];
@@ -120,11 +126,6 @@ public class PuzzleSolver {
     else {
      System.out.println("Enter a valid direction to move"); 
     }
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        System.out.print(puzzle[i][j]);
-      }
-    }
     return direction;
   }
 
@@ -133,9 +134,9 @@ public class PuzzleSolver {
     return maxNodes;
   }
   
-  public static int findBlankColumn(int[][] puzzle) {
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 2; j++) {
+  public static int findBlankColumn() {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
         if (puzzle[i][j] == 0) {
           return j;
         }
@@ -144,14 +145,19 @@ public class PuzzleSolver {
     return -1;
   }
   
-  public static int findBlankRow(int[][] puzzle) {
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 2; j++) {
+  public static int findBlankRow() {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
         if (puzzle[i][j] == 0) {
           return i;
         }
       }
     }
     return -1;
+  }
+  
+  public static String getRandomDirection(String[] directions) {
+    int rnd = new Random().nextInt(directions.length);
+    return directions[rnd];
   }
 }

@@ -53,7 +53,9 @@ public class PuzzleSolver {
     }
     else if (input.startsWith("solve A-star")) {
       String heuristic = words[2];
+      System.out.println(heuristic);
       PuzzleSolver board = new PuzzleSolver(puzzle, 0, "");
+      System.out.println(board);
       AStarSolver.solve(heuristic, board);
     }
     else if (input.startsWith("solve beam")) {

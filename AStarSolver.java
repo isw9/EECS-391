@@ -8,14 +8,30 @@ public class AStarSolver {
   public static boolean goalFound = false;
   
   public static void solve(String heuristic, PuzzleSolver node) {
+    if (heuristic.equals("h1")) {
+      node.heuristic = h1(node);
+    }
+    else if (heuristic.equals("h2")) {
+      node.heuristic = h2(node);
+    }
+    else {
+      System.out.println("Enter a valid heuristic");
+    }
+    table.clear();
+    pQueue.clear();
+    goalFound = false;
+    
     String key = hashKey(node.board);
     table.put(key, node.board);
     pQueue.add(node);
+    System.out.println(node);
     //System.out.println(isGoalState(node.board));
-    while (pQueue.size() != 0 && goalFound == false) {
+    int i = 0;
+    while (pQueue.size() != 0 && goalFound == false && i < 1000) {
       PuzzleSolver currentNode = pQueue.poll();
       if (!isGoalState(currentNode.board)) {
         expandNode(currentNode);
+        i++;
       }
       else {
         System.out.println("Heuristic: " + currentNode.heuristic);
@@ -31,6 +47,7 @@ public class AStarSolver {
       int[][] currentBoardCopy = currentBoard;
       if (validMove(directions[i], currentBoardCopy)) {
         int[][] boardPosition = starMove(directions[i], node.board);
+        System.out.println(alreadyExpanded(boardPosition));
         if (!alreadyExpanded(boardPosition)) { 
           PuzzleSolver unexploredNode = new PuzzleSolver(boardPosition, 
                                                        node.heuristic, 
@@ -160,7 +177,27 @@ public class AStarSolver {
   }
   
   public static boolean alreadyExpanded(int[][] board) {
-    return table.containsValue(board);
+    String key = hashKey(board);
+    return table.containsKey(key);
+  }
+  
+  public static int h2(PuzzleSolver node) {
+    return 2;
+  }
+  
+  public static int h1(PuzzleSolver node) {
+    int misplacedTiles = 0;
+    int goalTile = 0;
+    int[][] board = node.board;
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        if (board[i][j] != goalTile) {
+          misplacedTiles++;
+        }
+      }
+      goalTile++;
+    }
+    return misplacedTiles;
   }
 }
 

@@ -4,12 +4,25 @@ import java.util.*;
 public class AStarSolver {
   public static String[] directions = {"up", "down", "left", "right"};
   public static PriorityQueue<PuzzleSolver> pQueue = new PriorityQueue<PuzzleSolver>(100, new BoardComparator());
+  public static Hashtable<String, int[][]> table = new Hashtable<String, int[][]>();
+  public static boolean goalFound = false;
   
   public static void solve(String heuristic, PuzzleSolver node) {
+    String key = hashKey(node.board);
+    table.put(key, node.board);
     pQueue.add(node);
-    System.out.println(isGoalState(node.board));
-    expandNode(pQueue.poll());
-    System.out.println("Printing from A Star");
+    //System.out.println(isGoalState(node.board));
+    while (pQueue.size() != 0 && goalFound == false) {
+      PuzzleSolver currentNode = pQueue.poll();
+      if (!isGoalState(currentNode.board)) {
+        expandNode(currentNode);
+      }
+      else {
+        System.out.println("Heuristic: " + currentNode.heuristic);
+        System.out.println("Path: " + currentNode.path);
+        System.out.println("COMPLETE");
+      }
+    }
   }
   
   public static void expandNode(PuzzleSolver node) {
@@ -18,11 +31,15 @@ public class AStarSolver {
       int[][] currentBoardCopy = currentBoard;
       if (validMove(directions[i], currentBoardCopy)) {
         int[][] boardPosition = starMove(directions[i], node.board);
-        
-        PuzzleSolver unexploredNode = new PuzzleSolver(boardPosition, 
+        if (!alreadyExpanded(boardPosition)) { 
+          PuzzleSolver unexploredNode = new PuzzleSolver(boardPosition, 
                                                        node.heuristic, 
-                                                       node.path + directions[i]);
-        pQueue.add(unexploredNode);
+                                                       //node.path + directions[i]);
+                                                         directions[i]);
+          pQueue.add(unexploredNode);
+          String key = hashKey(boardPosition);
+          table.put(key, boardPosition);
+        }
       }
     }
   }
@@ -89,6 +106,7 @@ public class AStarSolver {
         count++;
       }
     }
+    goalFound = true;
     return true;
   }
   
@@ -129,6 +147,20 @@ public class AStarSolver {
      System.out.println("Enter a valid direction to move"); 
     }
     return result;
+  }
+  
+  public static String hashKey(int[][] board) {
+    String key = "";
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        key = key + Integer.toString(board[i][j]);
+      }
+    }
+    return key;
+  }
+  
+  public static boolean alreadyExpanded(int[][] board) {
+    return table.containsValue(board);
   }
 }
 

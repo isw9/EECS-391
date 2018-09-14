@@ -6,6 +6,16 @@ import java.util.Random;
 public class PuzzleSolver {
   public static int[][] puzzle = new int[3][3];
   
+  public int[][] board = new int[3][3];
+  public int heuristic;
+  public String path;
+  
+  public PuzzleSolver(int[][] board, int heuristic, String path) {
+    this.board = board;
+    this.heuristic = heuristic;
+    this.path = path;
+  }
+  
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
     String input = "";
@@ -25,16 +35,17 @@ public class PuzzleSolver {
       setState(desiredState);
     }
     else if (input.startsWith("randomizeState")) {
+      setState("b12345678");
       int randomMoves = Integer.parseInt(words[1]);
       randomizeState(randomMoves);
     }
     else if (input.startsWith("printState")) {
-      printState();
+      printState(puzzle);
     }
     else if (input.startsWith("move")) {
       String direction = words[1];
       if (Arrays.asList("up", "down", "left", "right").contains(direction)) {
-        move(direction);
+        move(direction, puzzle);
       }
       else {
         System.out.println("Please enter a valid direction (up, down, left, or right)");
@@ -42,7 +53,8 @@ public class PuzzleSolver {
     }
     else if (input.startsWith("solve A-star")) {
       String heuristic = words[2];
-      AStarSolver.solve(heuristic);
+      PuzzleSolver board = new PuzzleSolver(puzzle, 0, "");
+      AStarSolver.solve(heuristic, board);
     }
     else if (input.startsWith("solve beam")) {
       int states = Integer.parseInt(words[2]);
@@ -80,53 +92,53 @@ public class PuzzleSolver {
     String[] possibleDirections = {"up", "down", "left", "right"};
     for (int i = 0; i < randomMoves; i++) {
       String direction = getRandomDirection(possibleDirections);
-      move(direction);
+      move(direction, puzzle);
     }
     System.out.println("Making " + randomMoves + " random moves");
   }
   
-  public static void printState() {
+  public static void printState(int[][] board) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        System.out.print(puzzle[i][j] + " ");
+        System.out.print(board[i][j] + " ");
       }
       System.out.print("\n");
     }
   }
-  public static String move(String direction) {
+  public static int[][] move(String direction, int[][] board) {
     System.out.println("Moving in the direction of " + direction);
-    int column = findBlankColumn();
-    int row = findBlankRow();
+    int column = findBlankColumn(board);
+    int row = findBlankRow(board);
     System.out.println("row is: " + row);
     System.out.println("column is: " + column);
     if (direction.equals("up")) {
       if (row == 1 || row == 2) {
-        puzzle[row][column] = puzzle[row-1][column];
-        puzzle[row-1][column] = 0;
+        board[row][column] = board[row-1][column];
+        board[row-1][column] = 0;
       }
     }
     else if (direction.equals("down")) {
       if (row == 0 || row == 1) {
-        puzzle[row][column] = puzzle[row+1][column];
-        puzzle[row+1][column] = 0;
+        board[row][column] = board[row+1][column];
+        board[row+1][column] = 0;
       }
     }
     else if (direction.equals("left")) {
       if (column == 1 || column == 2) {
-        puzzle[row][column] = puzzle[row][column-1];
-        puzzle[row][column-1] = 0;
+        board[row][column] = board[row][column-1];
+        board[row][column-1] = 0;
       }
     }
     else if (direction.equals("right")) {
       if (column == 0 || column == 1) {
-        puzzle[row][column] = puzzle[row][column+1];
-        puzzle[row][column+1] = 0;                             
+        board[row][column] = board[row][column+1];
+        board[row][column+1] = 0;                             
       }
     }
     else {
      System.out.println("Enter a valid direction to move"); 
     }
-    return direction;
+    return board;
   }
 
   public static int maxNodes(int maxNodes) {
@@ -134,10 +146,10 @@ public class PuzzleSolver {
     return maxNodes;
   }
   
-  public static int findBlankColumn() {
+  public static int findBlankColumn(int[][] board) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        if (puzzle[i][j] == 0) {
+        if (board[i][j] == 0) {
           return j;
         }
       }
@@ -145,10 +157,10 @@ public class PuzzleSolver {
     return -1;
   }
   
-  public static int findBlankRow() {
+  public static int findBlankRow(int[][] board) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        if (puzzle[i][j] == 0) {
+        if (board[i][j] == 0) {
           return i;
         }
       }

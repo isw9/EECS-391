@@ -60,7 +60,8 @@ public class PuzzleSolver {
     }
     else if (input.startsWith("solve beam")) {
       int states = Integer.parseInt(words[2]);
-      BeamSolver.solve(states);
+      PuzzleSolver board = new PuzzleSolver(puzzle, 0, "");
+      BeamSolver.solve(states, board);
     }
     else if (input.startsWith("maxNodes")) {
       int maxNodes = Integer.parseInt(words[1]);

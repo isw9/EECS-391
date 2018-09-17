@@ -64,8 +64,9 @@ public class BeamSolver {
           int heuris = 0;
           heuris = Util.h2(boardPosition);
           Node unexploredNode = new Node(boardPosition, 
-                                                         heuris, 
-                                                         path.toString());
+                                         heuris, 
+                                         path.toString(),
+                                         node.costSoFar + 1);
           beamQueueTwo.add(unexploredNode);
           beamSet.add(boardPosition);
         }

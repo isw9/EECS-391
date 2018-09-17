@@ -11,12 +11,14 @@ public class Node {
   public int[][] board = new int[3][3];
   public int heuristic;
   public String path;
+  int costSoFar;
   
   // A node will consist of a "board", a heuristic value, and the path that was taken to get to that Node
-  public Node(int[][] board, int heuristic, String path) {
+  public Node(int[][] board, int heuristic, String path, int costSoFar) {
     this.board = board;
     this.heuristic = heuristic;
     this.path = path;
+    this.costSoFar = costSoFar;
   }
   
   public static void main(String[] args) {
@@ -36,6 +38,7 @@ public class Node {
       String rowTwo = words[2];
       String rowThree = words[3];
       String desiredState = rowOne + rowTwo + rowThree;
+      System.out.println(desiredState);
       setState(desiredState);
     }
     else if (input.startsWith("randomizeState")) {
@@ -58,13 +61,12 @@ public class Node {
     else if (input.startsWith("solve A-star")) {
       String heuristic = words[2];
       System.out.println(heuristic);
-      Node board = new Node(puzzle, 0, "");
-      System.out.println(board);
+      Node board = new Node(puzzle, 0, "", 0);
       AStarSolver.solve(heuristic, board);
     }
     else if (input.startsWith("solve beam")) {
       int states = Integer.parseInt(words[2]);
-      Node board = new Node(puzzle, 0, "");
+      Node board = new Node(puzzle, 0, "", 0);
       BeamSolver.solve(states, board);
     }
     else if (input.startsWith("maxNodes")) {
@@ -77,23 +79,23 @@ public class Node {
   }
   
   // sets the global puzzle as anything we desire
-  // String must follow format "b12 345 678"
+  // String must follow format "b12345678"
   public static int[][] setState(String desiredState) {
     desiredState = desiredState.replace('b', '0');
     String[] integersAsText = desiredState.split("");
-    int row = 0;
-    int column = 0;
-    for (int i = 1; i < integersAsText.length; i++) {
-      if (row > 2) {
-        row = 0;
-      }
-      column = column % 3;
-      puzzle[row][column] = Integer.parseInt(integersAsText[i]);
-      if (column == 2) {
-        row++;
-      }
-      column++;
+
+    for (int i = 0; i < integersAsText.length; i++) {
+      System.out.println(Integer.parseInt(integersAsText[i]));
     }
+    puzzle[0][0] = Integer.parseInt(integersAsText[0]);
+    puzzle[0][1] = Integer.parseInt(integersAsText[1]);
+    puzzle[0][2] = Integer.parseInt(integersAsText[2]);
+    puzzle[1][0] = Integer.parseInt(integersAsText[3]);
+    puzzle[1][1] = Integer.parseInt(integersAsText[4]);
+    puzzle[1][2] = Integer.parseInt(integersAsText[5]);
+    puzzle[2][0] = Integer.parseInt(integersAsText[6]);
+    puzzle[2][1] = Integer.parseInt(integersAsText[7]);
+    puzzle[2][2] = Integer.parseInt(integersAsText[8]);
     return puzzle;
   }
   

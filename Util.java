@@ -1,10 +1,11 @@
+// This class contains methods that A* search and beam search both use in an attempt to DRY up code
 class Util {
-
+  
+  // Calculates h2 based on the book definition 
   public static int h2(int[][] board) {
     int count = 0;
     int expected = 0;
     int[][] finalBoard = { {0, 1, 2}, {3, 4, 5}, {6, 7, 8} };
-    
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         int value = board[i][j];
@@ -17,6 +18,7 @@ class Util {
     return count;
   }
   
+  // Calculates h1 based on the book defintion 
   public static int h1(int[][] board) {
     int misplacedTiles = 0;
     int goalTile = 0;
@@ -31,6 +33,7 @@ class Util {
     return misplacedTiles;
   }
   
+  // Gets the column that the int target is in 
   public static int getColumn(int[][] puzzle, int target) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
@@ -42,6 +45,7 @@ class Util {
     return -1;
   }
   
+  // Gets the row that the int target is in
   public static int getRow(int[][] puzzle, int target) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
@@ -53,6 +57,7 @@ class Util {
     return -1;
   }
  
+  // Returns an int[][] that reflects the given int[][] with the "blank" moved in the appropriate direction
   public static int[][] solveMove(String direction, int[][] board) {
     int[][] result = new int[3][3];
     for (int i = 0; i < 3; i++) {
@@ -92,6 +97,8 @@ class Util {
     return result;
   }
   
+  // Checks if a given move is valid. An example of an invalid move is trying
+  // to move the blank to the left when it is already in the leftmost column
   public static boolean validMove(String direction, int[][] puzzle) {
     int row = Util.getRow(puzzle, 0);
     int column = Util.getColumn(puzzle, 0);

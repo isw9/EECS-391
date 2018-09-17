@@ -2,15 +2,18 @@ import java.util.Scanner;
 import java.util.Queue;
 import java.util.Arrays;
 import java.util.Random;
+import java.io.File;
 
-public class PuzzleSolver {
+public class Node {
+  // global representation of the current state of the puzzle we want to solve
   public static int[][] puzzle = new int[3][3];
   
   public int[][] board = new int[3][3];
   public int heuristic;
   public String path;
   
-  public PuzzleSolver(int[][] board, int heuristic, String path) {
+  // A node will consist of a "board", a heuristic value, and the path that was taken to get to that Node
+  public Node(int[][] board, int heuristic, String path) {
     this.board = board;
     this.heuristic = heuristic;
     this.path = path;
@@ -25,6 +28,7 @@ public class PuzzleSolver {
     }
   }
   
+  // decide what to do based on the inputted string
   public static void grabInput(String input) {
     String[] words = input.split("\\s+");
     if (input.startsWith("setState")) {
@@ -54,13 +58,13 @@ public class PuzzleSolver {
     else if (input.startsWith("solve A-star")) {
       String heuristic = words[2];
       System.out.println(heuristic);
-      PuzzleSolver board = new PuzzleSolver(puzzle, 0, "");
+      Node board = new Node(puzzle, 0, "");
       System.out.println(board);
       AStarSolver.solve(heuristic, board);
     }
     else if (input.startsWith("solve beam")) {
       int states = Integer.parseInt(words[2]);
-      PuzzleSolver board = new PuzzleSolver(puzzle, 0, "");
+      Node board = new Node(puzzle, 0, "");
       BeamSolver.solve(states, board);
     }
     else if (input.startsWith("maxNodes")) {
@@ -72,6 +76,8 @@ public class PuzzleSolver {
     }
   }
   
+  // sets the global puzzle as anything we desire
+  // String must follow format "b12 345 678"
   public static int[][] setState(String desiredState) {
     desiredState = desiredState.replace('b', '0');
     String[] integersAsText = desiredState.split("");
@@ -91,6 +97,7 @@ public class PuzzleSolver {
     return puzzle;
   }
   
+  // Randomly moves the blank tile N spots starting from the goal state
   public static void randomizeState(int randomMoves) {
     String[] possibleDirections = {"up", "down", "left", "right"};
     for (int i = 0; i < randomMoves; i++) {
@@ -100,6 +107,7 @@ public class PuzzleSolver {
     System.out.println("Making " + randomMoves + " random moves");
   }
   
+  // Prints out a visual representation of the global board at any point in time
   public static void printState(int[][] board) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
@@ -108,6 +116,10 @@ public class PuzzleSolver {
       System.out.print("\n");
     }
   }
+  
+  // Method to actually move the blank tile for an inputted board
+  // Note this method retuns an int[][] and does NOT modify the global
+  // puzzle variable at the top of this class
   public static int[][] move(String direction, int[][] board) {
     System.out.println("Moving in the direction of " + direction);
     int column = findBlankColumn(board);
@@ -144,11 +156,13 @@ public class PuzzleSolver {
     return board;
   }
 
+  // Sets a maximum number of nodes to explore
   public static int maxNodes(int maxNodes) {
     System.out.println("Max nodes is " + maxNodes);
     return maxNodes;
   }
   
+  // finds the column the blank is located
   public static int findBlankColumn(int[][] board) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
@@ -160,6 +174,7 @@ public class PuzzleSolver {
     return -1;
   }
   
+  // finds the row the blank is located
   public static int findBlankRow(int[][] board) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
@@ -171,6 +186,7 @@ public class PuzzleSolver {
     return -1;
   }
   
+  // Method that randomly gets a new direction (up, down, left, or right)
   public static String getRandomDirection(String[] directions) {
     int rnd = new Random().nextInt(directions.length);
     return directions[rnd];

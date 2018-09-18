@@ -11,7 +11,6 @@ public class AStarSolver {
 
   // The Node class enters here
   public static void solve(String heuristic, Node node) {
-    System.out.println(" STAR");
     if (heuristic.equals("h1")) {
       node.heuristic = Util.h1(node.board);
     }
@@ -60,8 +59,6 @@ public class AStarSolver {
           Node unexploredNode = new Node(boardPosition, 
                                          heuris, 
                                          path.toString(), node.costSoFar + 1);
-          System.out.println("\n");
-          Node.printState(boardPosition);
           pQueue.add(unexploredNode);
           set.add(stringify(boardPosition));
         }

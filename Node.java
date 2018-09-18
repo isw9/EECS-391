@@ -2,7 +2,7 @@ import java.util.Scanner;
 import java.util.Queue;
 import java.util.Arrays;
 import java.util.Random;
-import java.io.File;
+import java.io.*;
 
 public class Node {
   // global representation of the current state of the puzzle we want to solve
@@ -13,7 +13,8 @@ public class Node {
   public String path;
   int costSoFar;
   
-  // A node will consist of a "board", a heuristic value, and the path that was taken to get to that Node
+  // A node will consist of a "board", a heuristic value, 
+  // the path that was taken to get to that Node, and the total number of moved made so far to get to the current state
   public Node(int[][] board, int heuristic, String path, int costSoFar) {
     this.board = board;
     this.heuristic = heuristic;
@@ -21,8 +22,14 @@ public class Node {
     this.costSoFar = costSoFar;
   }
   
-  public static void main(String[] args) {
+  public static void main(String[] args) throws FileNotFoundException {
     Scanner scanner = new Scanner(System.in);
+    File file = new File("input.txt");
+    Scanner fileScanner = new Scanner(file);
+    while (fileScanner.hasNextLine()) {
+      String command = fileScanner.nextLine();
+      grabInput(command);
+    }
     String input = "";
     while (!input.equals("quit")) {
       input = scanner.nextLine();
@@ -38,7 +45,6 @@ public class Node {
       String rowTwo = words[2];
       String rowThree = words[3];
       String desiredState = rowOne + rowTwo + rowThree;
-      System.out.println(desiredState);
       setState(desiredState);
     }
     else if (input.startsWith("randomizeState")) {
@@ -60,7 +66,6 @@ public class Node {
     }
     else if (input.startsWith("solve A-star")) {
       String heuristic = words[2];
-      System.out.println(heuristic);
       Node board = new Node(puzzle, 0, "", 0);
       AStarSolver.solve(heuristic, board);
     }
@@ -83,10 +88,7 @@ public class Node {
   public static int[][] setState(String desiredState) {
     desiredState = desiredState.replace('b', '0');
     String[] integersAsText = desiredState.split("");
-
-    for (int i = 0; i < integersAsText.length; i++) {
-      System.out.println(Integer.parseInt(integersAsText[i]));
-    }
+    
     puzzle[0][0] = Integer.parseInt(integersAsText[0]);
     puzzle[0][1] = Integer.parseInt(integersAsText[1]);
     puzzle[0][2] = Integer.parseInt(integersAsText[2]);
@@ -106,7 +108,7 @@ public class Node {
       String direction = getRandomDirection(possibleDirections);
       move(direction, puzzle);
     }
-    System.out.println("Making " + randomMoves + " random moves");
+    System.out.println("Made " + randomMoves + " random moves");
   }
   
   // Prints out a visual representation of the global board at any point in time
@@ -123,11 +125,8 @@ public class Node {
   // Note this method retuns an int[][] and does NOT modify the global
   // puzzle variable at the top of this class
   public static int[][] move(String direction, int[][] board) {
-    System.out.println("Moving in the direction of " + direction);
     int column = findBlankColumn(board);
     int row = findBlankRow(board);
-    System.out.println("row is: " + row);
-    System.out.println("column is: " + column);
     if (direction.equals("up")) {
       if (row == 1 || row == 2) {
         board[row][column] = board[row-1][column];

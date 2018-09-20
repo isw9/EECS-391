@@ -10,7 +10,7 @@ public class AStarSolver {
   public static boolean goalFound = false;
 
   // The Node class enters here
-  public static void solve(String heuristic, Node node) {
+  public static void solve(String heuristic, Node node, int maxNodes) {
     if (heuristic.equals("h1")) {
       node.heuristic = Util.h1(node.board);
     }
@@ -26,27 +26,31 @@ public class AStarSolver {
     goalFound = false;
     set.add(stringify(node.board));
     pQueue.add(node);
-
+    int counter = 0;
     // keep picking a node to expand from the priority queue until the puzzle is solved
-    while (pQueue.size() != 0 && goalFound == false) {
+    while (pQueue.size() != 0 && goalFound == false && counter <= maxNodes) {
       Node currentNode = pQueue.poll();
-      if (!isGoalState(currentNode.board)) {
+        if (!isGoalState(currentNode.board)) {
         expandNode(currentNode, heuristic);
+        counter++;
       }
       else {
         System.out.println("Path:" + currentNode.path);
-        System.out.println("COMPLETE");
+        System.out.println("Number of moves:" + currentNode.costSoFar);
       }
     }
+    if (!(counter < maxNodes)) {
+      System.out.println("Maximum node limit was exceeded during search");
+    }
   }
-  
+
   //When expanding a node, only add its successor to the queue if it has not already been examined
   public static void expandNode(Node node, String heuristic) {
     for (int i = 0; i < 4; i++) {
       int[][] currentBoard = node.board;
       if (Util.validMove(directions[i], currentBoard)) {
         int[][] boardPosition = Util.solveMove(directions[i], currentBoard);
-        if (!alreadyExpanded(boardPosition)) { 
+        if (!alreadyExpanded(boardPosition)) {
           StringBuilder path = new StringBuilder();
           path.append(node.path).append(" ").append(directions[i].substring(0,1));
           int heuris = 0;
@@ -56,8 +60,8 @@ public class AStarSolver {
           else {
             heuris = Util.h2(boardPosition);
           }
-          Node unexploredNode = new Node(boardPosition, 
-                                         heuris, 
+          Node unexploredNode = new Node(boardPosition,
+                                         heuris,
                                          path.toString(), node.costSoFar + 1);
           pQueue.add(unexploredNode);
           set.add(stringify(boardPosition));
@@ -65,7 +69,7 @@ public class AStarSolver {
       }
     }
   }
- 
+
   // returns true if the inputted int[][] is the goal state
   public static boolean isGoalState(int[][] puzzle) {
     int count = 0;
@@ -80,12 +84,12 @@ public class AStarSolver {
     goalFound = true;
     return true;
   }
- 
+
   // returns true if the board in question has already been part of a node that has been expanded
   public static boolean alreadyExpanded(int[][] board) {
     return set.contains(stringify(board));
   }
-  
+
   public static String stringify(int[][] board) {
     StringBuilder representation = new StringBuilder();
     for (int i = 0; i < 3; i++) {

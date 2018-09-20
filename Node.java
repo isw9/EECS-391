@@ -74,7 +74,7 @@ public class Node {
     else if (input.startsWith("solve beam")) {
       int states = Integer.parseInt(words[2]);
       Node board = new Node(puzzle, 0, "", 0);
-      BeamSolver.solve(states, board, globalMaxNodes);
+      BeamSolver.solve(states, board);
     }
     else if (input.startsWith("maxNodes")) {
       int maxNodes = Integer.parseInt(words[1]);

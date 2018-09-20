@@ -10,7 +10,7 @@ public class BeamSolver {
 
   // This class is called from the main node class
   // Given a node and a k value, this solves the 8 puzzle using beam search
-  public static void solve(int k, Node node, int maxNodes) {
+  public static void solve(int k, Node node) {
     node.heuristic = Util.h2(node.board);
     //clear the priority queue and hash table so we know they are empty and THEN add the first node
     beamSet.clear();
@@ -28,13 +28,12 @@ public class BeamSolver {
 
 
     int counter = 0;
-    while (puzzleSolved == false && counter <= maxNodes) {
+    while (puzzleSolved == false) {
     //keep picking a node to expand from the priority queue beamQueue until the puzzle is solved or beamQueue is empty
       while (beamQueue.size() != 0) {
         Node currentNode = beamQueue.poll();
         if (!isGoalState(currentNode.board)) {
           expandNode(currentNode);
-          counter++;
         }
         else {
           System.out.println("Path: " + currentNode.path);
@@ -51,9 +50,6 @@ public class BeamSolver {
         i++;
       }
       beamQueueTwo.clear();
-    }
-    if (!(counter < maxNodes)) {
-      System.out.println("Maximum node limit was exceeded during search");
     }
   }
 

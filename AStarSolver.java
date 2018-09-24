@@ -10,7 +10,7 @@ public class AStarSolver {
   public static boolean goalFound = false;
 
   // The Node class enters here
-  public static void solve(String heuristic, Node node, int maxNodes) {
+  public static int solve(String heuristic, Node node, int maxNodes) {
     if (heuristic.equals("h1")) {
       node.heuristic = Util.h1(node.board);
     }
@@ -35,13 +35,16 @@ public class AStarSolver {
         counter++;
       }
       else {
-        System.out.println("Path:" + currentNode.path);
-        System.out.println("Number of moves:" + currentNode.costSoFar);
+        System.out.println("Path: " + currentNode.path);
+        System.out.println("Number of moves: " + currentNode.costSoFar);
+        return currentNode.costSoFar;
       }
     }
     if (!(counter < maxNodes)) {
-      System.out.println("Maximum node limit was exceeded during search");
+     // System.out.println("Maximum node limit was exceeded during search");
+      return 0;
     }
+    return -1;
   }
 
   //When expanding a node, only add its successor to the queue if it has not already been examined

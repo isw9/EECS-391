@@ -9,6 +9,9 @@ public class Node {
   public static int[][] puzzle = new int[3][3];
   //start the maxNodes as really high if we are not explicitly given a max number of nodes to consider
   public static int globalMaxNodes = 100000000;
+  
+  public static Random rnd = new Random();
+
 
   public int[][] board = new int[3][3];
   public int heuristic;
@@ -25,8 +28,10 @@ public class Node {
   }
 
   public static void main(String[] args) throws FileNotFoundException {
+
+    rnd.setSeed(10);
     Scanner scanner = new Scanner(System.in);
-    File file = new File("input.txt");
+    File file = new File(args[0].toString());
     Scanner fileScanner = new Scanner(file);
     while (fileScanner.hasNextLine()) {
       String command = fileScanner.nextLine();
@@ -80,6 +85,15 @@ public class Node {
       int maxNodes = Integer.parseInt(words[1]);
       maxNodes(maxNodes);
     }
+    else if (input.startsWith("experiment_a")) {
+      experiment_a();
+    }
+    else if (input.startsWith("experiment_b")) {
+      experiment_b();
+    }
+    else if (input.startsWith("experiment_c")) {
+      experiment_c();
+    }
     else {
       System.out.println("Please enter a valid command");
     }
@@ -110,7 +124,6 @@ public class Node {
       String direction = getRandomDirection(possibleDirections);
       move(direction, puzzle);
     }
-    System.out.println("Made " + randomMoves + " random moves");
   }
 
   // Prints out a visual representation of the global board at any point in time
@@ -187,10 +200,120 @@ public class Node {
     }
     return -1;
   }
+  
+  public static void experiment_a() {
+    for (int j = 5; j <= 100; j = j + 5) {
+      int solveCounter = 0;
+      int failCounter = 0;
+      for (int i = 5; i < 15; i++) {
+        int counter = 0;
+        maxNodes(j);
+        while (counter < 5) {
+          setState("b12345678");
+          randomizeState(i);
+          Node board = new Node(puzzle, 0, "", 0);
+          if (AStarSolver.solve("h1", board, globalMaxNodes) > 0) {
+            solveCounter++;
+          }
+          else {
+            failCounter++;
+          }
+          if (AStarSolver.solve("h2", board, globalMaxNodes) > 0) {
+            solveCounter++;
+          }
+          else {
+            failCounter++;
+          }
+          counter++;
+        }
+      }
+        System.out.println("Max Nodes was: " + j);
+        System.out.println("Successful: " + solveCounter);
+        System.out.println("Failure: " + failCounter);
+    }
+  }
+  
+  public static void experiment_b() {
+    for (int j = 5; j <= 100; j = j + 5) {
+      int solveCounterH1 = 0;
+      int failCounterH1 = 0;
+      int solveCounterH2 = 0;
+      int failCounterH2 = 0;
+      for (int i = 5; i < 15; i++) {
+        int counter = 0;
+        maxNodes(j);
+        while (counter < 5) {
+          setState("b12345678");
+          randomizeState(i);
+          Node board = new Node(puzzle, 0, "", 0);
+          if (AStarSolver.solve("h1", board, globalMaxNodes) > 0) {
+            solveCounterH1++;
+          }
+          else {
+            failCounterH1++;
+          }
+          if (AStarSolver.solve("h2", board, globalMaxNodes) > 0) {
+            solveCounterH2++;
+          }
+          else {
+            failCounterH2++;
+          }
+          counter++;
+        }
+      }
+        System.out.println("Max Nodes was: " + j);
+        System.out.println("Successful H1: " + solveCounterH1);
+        System.out.println("Failure H1: " + failCounterH1);
+        System.out.println("Successful H2: " + solveCounterH2);
+        System.out.println("Failure H2: " + failCounterH2);
+    }   
+  }
+  
+  public static void experiment_c() {
+   double solveCounterH1 = 0;
+   double h1Total = 0;
+   double solveCounterH2 = 0;
+   double h2Total = 0;
+   double beamCounter = 0;
+   double beamTotal = 0;
+    for (int j = 5; j <= 100; j = j + 5) {
+      for (int i = 5; i < 15; i++) {
+        int counter = 0;
+        maxNodes(j);
+        while (counter < 5) {
+          setState("b12345678");
+          randomizeState(i);
+          Node board = new Node(puzzle, 0, "", 0);
+          int h1 = AStarSolver.solve("h1", board, globalMaxNodes);
+          if (h1 > 0) {
+            solveCounterH1++;
+            h1Total = h1Total + h1;
+          }
+          int h2 = AStarSolver.solve("h2", board, globalMaxNodes);
+          if (h2 > 0) {
+            solveCounterH2++;
+            h2Total = h2Total + h2;
+          }
+          counter++;
+        }
+      }
+      setState("b12345678");
+      randomizeState(10);
+      Node board = new Node(puzzle, 0, "", 0);     
+      int beam = BeamSolver.solve(4, board);
+      if (beam > 0) {
+        beamCounter++;
+        beamTotal = beamTotal + beam;
+      }
+    }
+    System.out.println("H1 average length: " + h1Total / solveCounterH1);
+    System.out.println("H2 average length: " + h2Total / solveCounterH2);
+    System.out.println("beam average length: " + beamTotal / beamCounter);  
+  }
 
   // Method that randomly gets a new direction (up, down, left, or right)
   public static String getRandomDirection(String[] directions) {
-    int rnd = new Random().nextInt(directions.length);
-    return directions[rnd];
+    int num = rnd.nextInt(directions.length);
+    return directions[num];
   }
 }

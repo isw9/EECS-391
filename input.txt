@@ -1,13 +1,13 @@
+setState b12 345 678
+printState
+solve A-star h1
 randomizeState 5
 printState
 solve A-star h1
-solve A-star h2
-solve beam 3
 randomizeState 4
 printState
 solve A-star h1
-solve A-star h2
-solve beam 2
+randomizeState 10
 setState b12 345 678
 move right
 move right
@@ -16,7 +16,54 @@ move left
 move down
 move left
 move up
+move up
+move right
+move down
 printState
 solve A-star h1
+setState b12 345 678
+printState
 solve A-star h2
+randomizeState 5
+printState
+solve A-star h2
+randomizeState 4
+printState
+solve A-star h2
+randomizeState 10
+setState b12 345 678
+move right
+move right
+move down
+move left
+move down
+move left
+move up
+move up
+move right
+move down
+printState
+solve A-star h2
+setState b12 345 678
+printState
+solve beam 3
+randomizeState 5
+printState
+solve beam 3
+randomizeState 4
+printState
+solve beam 3
+randomizeState 10
+setState b12 345 678
+move right
+move right
+move down
+move left
+move down
+move left
+move up
+move up
+move right
+move down
+printState
 solve beam 3

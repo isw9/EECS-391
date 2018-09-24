@@ -41,7 +41,7 @@ public class AStarSolver {
       }
     }
     if (!(counter < maxNodes)) {
-     // System.out.println("Maximum node limit was exceeded during search");
+      System.out.println("Maximum node limit was exceeded during search");
       return 0;
     }
     return -1;

@@ -94,6 +94,9 @@ public class Node {
     else if (input.startsWith("experiment_c")) {
       experiment_c();
     }
+    else if (input.startsWith("experiment_d")) {
+      experiment_d();
+    }
     else {
       System.out.println("Please enter a valid command");
     }
@@ -201,6 +204,7 @@ public class Node {
     return -1;
   }
   
+  // experiment_a tests
   public static void experiment_a() {
     for (int j = 5; j <= 100; j = j + 5) {
       int solveCounter = 0;
@@ -233,6 +237,7 @@ public class Node {
     }
   }
   
+  // experiment_b tests  
   public static void experiment_b() {
     for (int j = 5; j <= 100; j = j + 5) {
       int solveCounterH1 = 0;
@@ -269,6 +274,7 @@ public class Node {
     }   
   }
   
+  // experiment_c tests
   public static void experiment_c() {
    double solveCounterH1 = 0;
    double h1Total = 0;
@@ -294,21 +300,43 @@ public class Node {
             solveCounterH2++;
             h2Total = h2Total + h2;
           }
+          int beam = BeamSolver.solve(4, board);
+          if (beam > 0) {
+            beamCounter++;
+            beamTotal = beamTotal + beam;
+          }
           counter++;
         }
-      }
-      setState("b12345678");
-      randomizeState(10);
-      Node board = new Node(puzzle, 0, "", 0);     
-      int beam = BeamSolver.solve(4, board);
-      if (beam > 0) {
-        beamCounter++;
-        beamTotal = beamTotal + beam;
       }
     }
     System.out.println("H1 average length: " + h1Total / solveCounterH1);
     System.out.println("H2 average length: " + h2Total / solveCounterH2);
     System.out.println("beam average length: " + beamTotal / beamCounter);  
+  }
+  
+  // experiment_d tests
+  public static void experiment_d() {
+    int solveCounter = 0;
+    int failCounter = 0;
+    for (int j = 5; j <= 100; j = j + 5) {
+      for (int i = 5; i < 15; i++) {
+        int counter = 0;
+        while (counter < 5) {
+          setState("b12345678");
+          randomizeState(i);
+          Node board = new Node(puzzle, 0, "", 0);
+          if (BeamSolver.solve(4, board) > 0) {
+            solveCounter++;
+          }
+          else {
+            failCounter++;
+          }
+          counter++;
+        }
+      }
+    }
+    System.out.println("Successful H1: " + solveCounter);
+    System.out.println("Failure H1: " + failCounter);
   }
 
   // Method that randomly gets a new direction (up, down, left, or right)

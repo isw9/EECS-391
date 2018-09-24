@@ -7,6 +7,7 @@ public class BeamSolver {
   public static PriorityQueue<Node> beamQueueTwo = new PriorityQueue<Node>(10000000, new BoardComparator());
   public static HashSet<int[][]> beamSet = new HashSet<int[][]>();
   public static boolean puzzleSolved = false;
+  public static int max = 10000;
 
   // This class is called from the main node class
   // Given a node and a k value, this solves the 8 puzzle using beam search
@@ -28,16 +29,18 @@ public class BeamSolver {
 
 
     int nodeCount = 0;
-    while (puzzleSolved == false) { 
+    int count = 0;
+    while (puzzleSolved == false && count < max) { 
     //keep picking a node to expand from the priority queue beamQueue until the puzzle is solved or beamQueue is empty
       while (beamQueue.size() != 0) {
         Node currentNode = beamQueue.poll();
         if (!isGoalState(currentNode.board)) {
           expandNode(currentNode);
+          count++;
         }
         else {
-          System.out.println("Path: " + currentNode.path);
-          System.out.println("Number of moves: " + currentNode.costSoFar);
+       //   System.out.println("Path: " + currentNode.path);
+       //   System.out.println("Number of moves: " + currentNode.costSoFar);
           return currentNode.costSoFar;
         }
       }
@@ -51,6 +54,10 @@ public class BeamSolver {
         i++;
       }
       beamQueueTwo.clear();
+    }
+    if (count >= max) {
+   //   System.out.println("BEAM FAILURE");
+      return -1;
     }
     return 0;
   }

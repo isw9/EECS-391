@@ -24,12 +24,6 @@ for index, item in enumerate(petal_length):
 for index, item in enumerate(petal_width):
     petal_width[index] = float(item)
 
-#dataset.apply(pd.to_numeric, errors='ignore')
-#print(dataset.petal_width)
-#print(dataset.petal_width.dtype)
-
-
-#sns.regplot(x=dataset["petal_length"], y=dataset["petal_width"])
 plt.scatter(petal_length, petal_width)
 plt.xlabel("Petal Length (cm) ")
 plt.ylabel("Petal Width (cm) ")

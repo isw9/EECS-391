@@ -7,6 +7,7 @@ from sklearn import datasets
 import random
 from keras.layers import Dense, Activation
 from keras.models import Sequential, Model
+from array import array
 
 def modelNN(input_dimension):
     model = Sequential()
@@ -19,7 +20,7 @@ def sigmoid(z):
 
 data = pd.read_csv('irisdata.csv', sep=',')
 
-def problem_1_a():
+def problem_1_a(problem_letter, x_coords_line, y_coords_line):
     colors = ['red', 'blue']
     species = ['setosa', 'virginica', 'versicolor']
     for i in range(1, 3):
@@ -28,30 +29,77 @@ def problem_1_a():
 
     plt.xlabel('petal length (cm)')
     plt.ylabel('petal width (cm)')
-    plt.title('Petal Width vs Petal Length - Classes 2 and 3')
+    plt.title('Petal Width vs Petal Length - Problem #1(A)')
+    if (problem_letter == 'c'):
+        plt.plot(x_coords_line, y_coords_line)
+        plt.title('Petal Width vs Petal Length - Problem #1(C)')
+
     plt.show()
 
 def problem_1_b():
-    random.seed(123) #for debugging
     dataset = data.iloc[50:, [2,3]].values
     target = data.iloc[50:, 4].values
-    #seed the random_state so we get the same result on each pass for debugging purposes
-    x_train, x_test, y_train, y_test = model_selection.train_test_split(dataset, target, test_size = 0.4, random_state=10)
 
-    weight_one = random.random
-    weight_two = random.random
-    bias = random.random
+    x_train, x_test, y_train, y_test = model_selection.train_test_split(dataset, target, test_size = 0.4)
+
+    #initialize the two weights and bias to be random between 0 and 1
+    weight_one = 0.5
+    weight_two = 0.5
+    bias = -3.5
     error = []
-    n = 0
-    p_n = 0
 
-    size = x_train.size
-    print(size)
+
+    size = len(x_train)
     for i in range(size):
-        #?????
+        z = x_train[i][0]* weight_one + x_train[i][1] * weight_two + bias
+        sigmoid_result = sigmoid(z)
+        if (y_train[i] == 'versicolor'):
+            actual_class = 0
+        else:
+            actual_class = 1
+        error.append(sigmoid_result - actual_class)
+
+    size = len(x_test)
+    num_wrong = 0
+    num_right = 0
+    for i in range(size):
+        if (y_test[i] == 'versicolor'):
+            actual_class = 0
+
+        else:
+            actual_class = 1
+
+        z = x_test[i][0] * weight_one + x_test[i][1] * weight_two + bias
+        sigmoid_result = sigmoid(z)
+        if (sigmoid_result < 0.5):
+            predicted_class = 0
+        else:
+            predicted_class = 1
+
+        print("actual class: ", actual_class)
+        print("predicted class: ", predicted_class)
+        if (actual_class != predicted_class):
+            num_wrong += 1
+        else:
+            num_right += 1
+        print("--------")
+    percent_correct = num_right / (num_right + num_wrong)
+    print("part 1b-amount correct: ", percent_correct)
+
+    problem_1_c(weight_one, weight_two, bias)
+
+def problem_1_c(weight_one, weight_two, bias):
+    x = -bias / weight_one
+    y = -bias / weight_two
+    d = y
+    c = -y / x
+    line_x_coords = [0, x]
+    line_y_coords = []
+    for i in range(2):
+        line_y_coords.append(c * line_x_coords[i] + d)
+    problem_1_a('c', line_x_coords, line_y_coords)
 
 def problem_4_a():
-
     encodeOutput = []
     Input = data.iloc[50:, [2,3]].values
     Output = data.iloc[50:, 4].values
@@ -84,7 +132,7 @@ def problem_4_b():
 
 
 if __name__ == "__main__":
-    problem_1_a()
-    #problem_1_b()
-    problem_4_a()
-    problem_4_b()
+    problem_1_a('a', [], [])
+    problem_1_b()
+    #problem_4_a()
+    #problem_4_b()

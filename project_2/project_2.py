@@ -36,7 +36,7 @@ def problem_1_a(problem_letter, x_coords_line, y_coords_line):
 
     plt.show()
 
-def problem_1_b():
+def problem_1_b(problem_letter):
     dataset = data.iloc[50:, [2,3]].values
     target = data.iloc[50:, 4].values
 
@@ -44,8 +44,8 @@ def problem_1_b():
 
     #initialize the two weights and bias to be random between 0 and 1
     weight_one = 0.5
-    weight_two = 0.5
-    bias = -3.5
+    weight_two = 0.67
+    bias = - 3.4
     error = []
 
 
@@ -59,6 +59,13 @@ def problem_1_b():
             actual_class = 1
         error.append(sigmoid_result - actual_class)
 
+    if (problem_letter == 'e'):
+        x_test = [[4.8, 1.8], [5.1, 1.8], [5.1, 2], [5, 1.9], [5.1, 1.9]]
+        y_test = ['versicolor', 'virginica', 'virginica', 'viginica', 'versicolor'  ]
+
+    if (problem_letter == 'ee'):
+        x_test = [[4, 1.3], [4.6, 1.5], [3.3, 1], [3.9, 1.4], [6.6, 2.1], [6.3, 1.8], [6.1, 2.5], [6.7, 2.2]]
+        y_test = ['versicolor', 'versicolor', 'versicolor', 'versicolor', 'virginica', 'virginica', 'virginica', 'virginica']
     size = len(x_test)
     num_wrong = 0
     num_right = 0
@@ -84,7 +91,18 @@ def problem_1_b():
             num_right += 1
         print("--------")
     percent_correct = num_right / (num_right + num_wrong)
-    print("part 1b-amount correct: ", percent_correct)
+    if (problem_letter == 'e'):
+        print("part 1e-amount correct when looking near the decision boundary: ", percent_correct)
+        print('')
+        print('')
+    elif (problem_letter == 'ee'):
+        print("part 1e-amount correct when looking far from the decision boundary: ", percent_correct)
+        print('')
+        print('')
+    else:
+        print("part 1b-amount correct: ", percent_correct)
+        print('')
+        print('')
 
     problem_1_c(weight_one, weight_two, bias)
 
@@ -98,6 +116,11 @@ def problem_1_c(weight_one, weight_two, bias):
     for i in range(2):
         line_y_coords.append(c * line_x_coords[i] + d)
     problem_1_a('c', line_x_coords, line_y_coords)
+
+def problem_1_e():
+    problem_1_b('e')
+    problem_1_b('ee')
+
 
 def problem_4_a():
     encodeOutput = []
@@ -133,6 +156,7 @@ def problem_4_b():
 
 if __name__ == "__main__":
     problem_1_a('a', [], [])
-    problem_1_b()
+    problem_1_b('b')
+    problem_1_e()
     #problem_4_a()
     #problem_4_b()

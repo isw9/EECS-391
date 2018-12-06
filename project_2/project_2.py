@@ -8,6 +8,9 @@ import random
 from keras.layers import Dense, Activation
 from keras.models import Sequential, Model
 from array import array
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 def modelNN(input_dimension):
     model = Sequential()
@@ -104,7 +107,8 @@ def problem_1_b(problem_letter):
         print('')
         print('')
 
-    problem_1_c(weight_one, weight_two, bias)
+        problem_1_c(weight_one, weight_two, bias)
+        problem_1_d(dataset, target, weight_one, weight_two, bias)
 
 def problem_1_c(weight_one, weight_two, bias):
     x = -bias / weight_one
@@ -116,6 +120,34 @@ def problem_1_c(weight_one, weight_two, bias):
     for i in range(2):
         line_y_coords.append(c * line_x_coords[i] + d)
     problem_1_a('c', line_x_coords, line_y_coords)
+
+def problem_1_d(dataset, target, weight_one, weight_two, bias):
+    sigmoidValues = []
+    petal_length_values = []
+    petal_width_values = []
+    size = len(dataset)
+    for i in range(size):
+        z = dataset[i][0]* weight_one + dataset[i][1] * weight_two + bias
+        sigmoid_result = sigmoid(z)
+        sigmoidValues.append(sigmoid_result)
+        petal_length_values.append(dataset[i][0])
+        petal_width_values.append(dataset[i][1])
+
+    petal_length_values = np.array(petal_length_values)
+    x = np.reshape(petal_length_values, (10, 10))
+    y = np.reshape(petal_width_values, (10, 10))
+    z = np.reshape(sigmoidValues, (10, 10))
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot_surface(x, y, z)
+
+    ax.set_xlabel('petal length - cm')
+    ax.set_ylabel('petal width - cm')
+    ax.set_zlabel('sigmoid value')
+
+    plt.show()
 
 def problem_1_e():
     problem_1_b('e')
@@ -153,10 +185,21 @@ def problem_4_b():
     model = modelNN(4)
     model.fit(x=inputTrain,y=outputTrain,epochs=2000, validation_data=(inputVal,outputVal))
 
+def count_x():
+    dataset = data.iloc[50:, [2,3]].values
+    x_values = []
+    for i in range(len(dataset)):
+        x_values.append(dataset[i][0])
+
+    unique_values = set(x_values)             # == set(['a', 'b', 'c'])
+    unique_value_count = len(unique_values)
+    print(unique_value_count)
+
 
 if __name__ == "__main__":
-    problem_1_a('a', [], [])
+    #problem_1_a('a', [], [])
     problem_1_b('b')
-    problem_1_e()
+    #count_x()
+#    problem_1_e()
     #problem_4_a()
     #problem_4_b()

@@ -21,6 +21,56 @@ def modelNN(input_dimension):
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
+def get_line_coords(weight_one, weight_two, bias):
+    x = -bias / weight_one
+    y = -bias / weight_two
+    d = y
+    c = -y / x
+    line_x_coords = [0, x]
+    line_y_coords = []
+    for i in range(2):
+        line_y_coords.append(c * line_x_coords[i] + d)
+
+    result_coords = [line_x_coords, line_y_coords]
+    return result_coords
+
+def derivativeSigmoid(z):
+    #sigmoid_result = sigmoid(z)
+    return z * (1 - z)
+
+def mean_squared_error(dataset, target, weight_one, weight_two, bias, learning_rate):
+
+    squared_error_running_total = 0.0
+    squared_error_normalized = 0.0
+    weight_one_update = 0.0
+    weight_two_update = 0.0
+    bias_update = 0.0
+
+    size = len(dataset)
+    for i in range(size):
+        z = dataset[i][0]* weight_one + dataset[i][1] * weight_two + bias
+        sigmoid_result = sigmoid(z)
+        derivative_result = derivativeSigmoid(sigmoid_result)
+        if (target[i] == 'versicolor'):
+            actual_class = 0
+        else:
+            actual_class = 1
+
+        err_result = (sigmoid_result - actual_class)
+        weight_one_update = weight_one_update + (err_result * derivative_result * dataset[i][0])
+        weight_two_update = weight_two_update + (err_result * derivative_result * dataset[i][1])
+        bias_update = bias_update + (err_result * derivative_result)
+        squared_error_result = err_result ** 2
+        squared_error_running_total += squared_error_result
+
+    new_weight_one = weight_one - (learning_rate * weight_one_update)
+    new_weight_two = weight_two - (learning_rate * weight_two_update)
+    new_bias = bias - (learning_rate * bias)
+
+    squared_error_normalized = (squared_error_running_total / size)
+    return_array = [squared_error_normalized, new_weight_one, new_weight_two, new_bias]
+    return return_array
+
 data = pd.read_csv('irisdata.csv', sep=',')
 
 def problem_1_a(problem_letter, x_coords_line, y_coords_line):
@@ -36,6 +86,12 @@ def problem_1_a(problem_letter, x_coords_line, y_coords_line):
     if (problem_letter == 'c'):
         plt.plot(x_coords_line, y_coords_line)
         plt.title('Petal Width vs Petal Length - Problem #1(C)')
+    elif (problem_letter == '2_e_beginning'):
+        plt.plot(x_coords_line, y_coords_line)
+        plt.title('Petal Width vs Petal Length - Problem #2(E) before small step')
+    elif (problem_letter == '2_e_end'):
+        plt.plot(x_coords_line, y_coords_line)
+        plt.title("Petal Width vs Petal Length - Problem #2(E) after small step")
 
     plt.show()
 
@@ -45,11 +101,10 @@ def problem_1_b(problem_letter):
 
     x_train, x_test, y_train, y_test = model_selection.train_test_split(dataset, target, test_size = 0.4)
 
-    #initialize the two weights and bias to be random between 0 and 1
-    weight_one = 0.5
-    weight_two = 0.67
-    bias = - 3.4
-    error = []
+    #initialize the two weights and bias
+    weight_one = 0.48
+    weight_two = 0.99
+    bias = - 3.9
 
 
     size = len(x_train)
@@ -60,7 +115,6 @@ def problem_1_b(problem_letter):
             actual_class = 0
         else:
             actual_class = 1
-        error.append(sigmoid_result - actual_class)
 
     if (problem_letter == 'e'):
         x_test = [[4.8, 1.8], [5.1, 1.8], [5.1, 2], [5, 1.9], [5.1, 1.9]]
@@ -111,14 +165,9 @@ def problem_1_b(problem_letter):
         problem_1_d(dataset, target, weight_one, weight_two, bias)
 
 def problem_1_c(weight_one, weight_two, bias):
-    x = -bias / weight_one
-    y = -bias / weight_two
-    d = y
-    c = -y / x
-    line_x_coords = [0, x]
-    line_y_coords = []
-    for i in range(2):
-        line_y_coords.append(c * line_x_coords[i] + d)
+    line_coords = get_line_coords(weight_one, weight_two, bias)
+    line_x_coords = line_coords[0]
+    line_y_coords = line_coords[1]
     problem_1_a('c', line_x_coords, line_y_coords)
 
 def problem_1_d(dataset, target, weight_one, weight_two, bias):
@@ -153,6 +202,41 @@ def problem_1_e():
     problem_1_b('e')
     problem_1_b('ee')
 
+def problem_2_b():
+    dataset = data.iloc[50:, [2,3]].values
+    target = data.iloc[50:, 4].values
+    good_parameters = [.48, .99, -3.9]
+    bad_parameters = [.99, .98, 1.2]
+
+    good_mean_squared = mean_squared_error(dataset, target, good_parameters[0], good_parameters[1], good_parameters[2], .01)
+    bad_mean_squared= mean_squared_error(dataset, target, bad_parameters[0], bad_parameters[1], bad_parameters[2], .01)
+
+    print("Good parameters mean squared error: ", good_mean_squared[0])
+    print("Bad parameters mean squared error: ", bad_mean_squared[0])
+
+def problem_2_e():
+    dataset = data.iloc[50:, [2,3]].values
+    target = data.iloc[50:, 4].values
+    weight_one = .99
+    weight_two = .98
+    bias = -3.2
+
+    line_coords = get_line_coords(weight_one, weight_two, bias)
+    line_x_coords = line_coords[0]
+    line_y_coords = line_coords[1]
+    problem_1_a('2_e_beginning', line_x_coords, line_y_coords)
+
+    mean_squared_result = mean_squared_error(dataset, target, weight_one, weight_two, bias, .001)
+    update_results = mean_squared_result
+    for i in range(5):
+        mean_squared_result = mean_squared_error(dataset, target, update_results[1], update_results[2], update_results[3], .001)
+        update_results = mean_squared_result
+
+    line_coords = get_line_coords(update_results[1], update_results[2], update_results[3])
+    line_x_coords = line_coords[0]
+    line_y_coords = line_coords[1]
+    problem_1_a("2_e_end", line_x_coords, line_y_coords)
+
 
 def problem_4_a():
     encodeOutput = []
@@ -185,21 +269,13 @@ def problem_4_b():
     model = modelNN(4)
     model.fit(x=inputTrain,y=outputTrain,epochs=2000, validation_data=(inputVal,outputVal))
 
-def count_x():
-    dataset = data.iloc[50:, [2,3]].values
-    x_values = []
-    for i in range(len(dataset)):
-        x_values.append(dataset[i][0])
-
-    unique_values = set(x_values)             # == set(['a', 'b', 'c'])
-    unique_value_count = len(unique_values)
-    print(unique_value_count)
-
 
 if __name__ == "__main__":
-    #problem_1_a('a', [], [])
+    problem_1_a('a', [], [])
     problem_1_b('b')
-    #count_x()
-#    problem_1_e()
-    #problem_4_a()
-    #problem_4_b()
+    problem_1_e()
+    problem_2_b()
+    problem_2_e()
+    input("Enter an integer to continue. I stopped here so you can look at my terminal results to problems 1, 2, and 3 before problem 4 completely fills up the screen ")
+    problem_4_a()
+    problem_4_b()

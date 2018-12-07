@@ -13,15 +13,20 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import randint
 
+#used by keras - inspired by the tutorial
+#needed to add an additional parameter so I could specify how many dimensions we are considering
 def modelNN(input_dimension):
     model = Sequential()
     model.add(Dense(1,input_dim=input_dimension,activation='sigmoid'))
     model.compile(optimizer='rmsprop',loss='mean_squared_error',metrics=['accuracy'])
     return model
 
+#returns the sigmoid of an input
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
+#given two different weights and a bias, returns x coordinates and y coordinates
+#so we can plot a line using those coordinates
 def get_line_coords(weight_one, weight_two, bias):
     line_y_coords = []
     line_x_coords = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -34,9 +39,12 @@ def get_line_coords(weight_one, weight_two, bias):
     result_coords = [line_x_coords, line_y_coords]
     return result_coords
 
+# the derivative of the sigmoid function
 def derivativeSigmoid(z):
     return z * (1 - z)
 
+# does gradient descent and computes the mean squared error. Dataset is the values of petal
+# length and petal width. Target is the values of the class of each datapoint
 def mean_squared_error(dataset, target, weight_one, weight_two, bias, learning_rate):
 
     squared_error_running_total = 0.0
@@ -62,16 +70,20 @@ def mean_squared_error(dataset, target, weight_one, weight_two, bias, learning_r
         bias_update += (err_result * derivative_result)
         squared_error_running_total += squared_error_result
 
+    #computes new weights based on the updated weights computed in the above loop
     new_weight_one = weight_one - learning_rate * weight_one_update
     new_weight_two = weight_two - learning_rate * weight_two_update
     new_bias = bias - learning_rate * bias_update
 
+    #computes the mean squared error
     squared_error_normalized = (squared_error_running_total / size)
+    #returns all of the above computed values
     return_array = [squared_error_normalized, new_weight_one, new_weight_two, new_bias]
     return return_array
 
-data = pd.read_csv('irisdata.csv', sep=',')
-
+#plots a scatter plot with the iris petal length and petal width data
+#takes in a problem letter to know what to title the plot
+#if a decision boundary needs to be plotted, also plots that
 def problem_1_a(problem_letter, x_coords_line, y_coords_line):
     colors = ['red', 'blue']
     species = ['setosa', 'virginica', 'versicolor']
@@ -95,22 +107,26 @@ def problem_1_a(problem_letter, x_coords_line, y_coords_line):
         plt.title("Petal Width vs Petal Length - Problem #2(E) after small step")
     elif (problem_letter == '4_c_5'):
         plt.plot(x_coords_line, y_coords_line)
-        plt.title("Petal Width vs Petal Length - Problem #2(E) after 5 trials")
+        plt.title("Petal Width vs Petal Length - Problem #3(C) after 5 trials")
     elif (problem_letter == '4_c_3000'):
         plt.plot(x_coords_line, y_coords_line)
-        plt.title("Petal Width vs Petal Length - Problem #2(E) after 3000 trials")
-    elif (problem_letter == '4_c_4995'):
+        plt.title("Petal Width vs Petal Length - Problem #3(C) after 3000 trials")
+    elif (problem_letter == '4_c_5000'):
         plt.plot(x_coords_line, y_coords_line)
-        plt.title("Petal Width vs Petal Length - Problem #3(C) after 4995 trials")
+        plt.title("Petal Width vs Petal Length - Problem #3(C) after 5000 trials")
     plt.show()
 
+# computes a linear decision boundary by creating a training and test data
+# takes in a problem letter to know which situation we are looking at
+# depending on the problem letter, may look at datapoints near or far away from the decision boundary
+# also computes the number of the test data set that were correct based on the computed decision boundary
 def problem_1_b(problem_letter):
     dataset = data.iloc[50:, [2,3]].values
     target = data.iloc[50:, 4].values
 
     x_train, x_test, y_train, y_test = model_selection.train_test_split(dataset, target, test_size = 0.4)
 
-    #initialize the two weights and bias
+    #initialize the two weights and bias - found by trial and error in problem 2_b
     weight_one = 0.48
     weight_two = 0.99
     bias = - 3.9
@@ -173,6 +189,7 @@ def problem_1_b(problem_letter):
         problem_1_c(weight_one, weight_two, bias)
         problem_1_d(dataset, target, weight_one, weight_two, bias)
 
+# plots a scatter plot with a decision boundary based on two weights and a bias
 def problem_1_c(weight_one, weight_two, bias):
     line_coords = get_line_coords(weight_one, weight_two, bias)
     line_x_coords = line_coords[0]
@@ -180,6 +197,9 @@ def problem_1_c(weight_one, weight_two, bias):
 
     problem_1_a('c', line_x_coords, line_y_coords)
 
+# creates a surface plot of petal length and petal width on the x and y axes.
+# sigmoid value is on the z axis. Kind of looks sigmoidish a little bit but is kind
+# of ugly
 def problem_1_d(dataset, target, weight_one, weight_two, bias):
     sigmoidValues = []
     petal_length_values = []
@@ -208,22 +228,29 @@ def problem_1_d(dataset, target, weight_one, weight_two, bias):
 
     plt.show()
 
+# shows the output of my simple classifier by calling problem_1_b()
+# shows output for datapoints near and far from the decision boundary
 def problem_1_e():
     problem_1_b('e')
     problem_1_b('ee')
 
+# shows output for the mean squared error for good weights and bias
+# as well as mean squared error for bad weights and bias
+# the values of "good" and "bad" parameters were found by trial and error
 def problem_2_b():
     dataset = data.iloc[50:, [2,3]].values
     target = data.iloc[50:, 4].values
     good_parameters = [.48, .99, -3.9]
     bad_parameters = [.99, .98, 1.2]
 
-    good_mean_squared = mean_squared_error(dataset, target, good_parameters[0], good_parameters[1], good_parameters[2], .01)
-    bad_mean_squared= mean_squared_error(dataset, target, bad_parameters[0], bad_parameters[1], bad_parameters[2], .01)
+    good_mean_squared = mean_squared_error(dataset, target, good_parameters[0], good_parameters[1], good_parameters[2], .001)
+    bad_mean_squared= mean_squared_error(dataset, target, bad_parameters[0], bad_parameters[1], bad_parameters[2], .001)
 
     print("Good parameters mean squared error: ", good_mean_squared[0])
     print("Bad parameters mean squared error: ", bad_mean_squared[0])
 
+# shows how the decision boundary can shift after a very small amount of using
+# gradient descent
 def problem_2_e():
     dataset = data.iloc[50:, [2,3]].values
     target = data.iloc[50:, 4].values
@@ -248,6 +275,9 @@ def problem_2_e():
     problem_1_a("2_e_end", line_x_coords, line_y_coords)
 
 #implements gradient descent with random weights and bias
+#pauses in the beginning, middle, and end to show:
+# 1) number trials vs mean squared error
+# 2) scatter plot of data and the updated decision boundary
 def problem_3_a_b_c():
     dataset = data.iloc[50:, [2,3]].values
     target = data.iloc[50:, 4].values
@@ -277,7 +307,7 @@ def problem_3_a_b_c():
             elif i == 3000:
                 plt.title("Mean Squared Error After 3000 trials")
             else:
-                plt.title("Mean Squared Error After 4995 trials")
+                plt.title("Mean Squared Error After 5000 trials")
 
             plt.show()
 
@@ -289,8 +319,9 @@ def problem_3_a_b_c():
             elif i == 3000:
                 problem_1_a("4_c_3000", line_x_coords, line_y_coords)
             else:
-                problem_1_a("4_c_4995", line_x_coords, line_y_coords)
+                problem_1_a("4_c_5000", line_x_coords, line_y_coords)
 
+#follows the tutorial to use a library to train a neural network
 def problem_4_a():
     encodeOutput = []
     Input = data.iloc[50:, [2,3]].values
@@ -305,6 +336,8 @@ def problem_4_a():
     model = modelNN(2)
     model.fit(x=inputTrain,y=outputTrain,epochs=2000, validation_data=(inputVal,outputVal))
 
+#follows the same format as the tutorial to use a library to train a neural network on
+#all three different species on all four different data dimensions
 def problem_4_b():
     encodeOutput = []
     Input = data.iloc[0:, [0, 1, 2, 3]].values
@@ -324,6 +357,7 @@ def problem_4_b():
 
 
 if __name__ == "__main__":
+    data = pd.read_csv('irisdata.csv', sep=',')
     problem_1_a('a', [], [])
     problem_1_b('b')
     problem_1_e()

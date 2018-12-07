@@ -111,9 +111,9 @@ def problem_1_a(problem_letter, x_coords_line, y_coords_line):
     elif (problem_letter == '4_c_3000'):
         plt.plot(x_coords_line, y_coords_line)
         plt.title("Petal Width vs Petal Length - Problem #3(C) after 3000 trials")
-    elif (problem_letter == '4_c_5000'):
+    elif (problem_letter == '4_c_4999'):
         plt.plot(x_coords_line, y_coords_line)
-        plt.title("Petal Width vs Petal Length - Problem #3(C) after 5000 trials")
+        plt.title("Petal Width vs Petal Length - Problem #3(C) after 4999 trials")
     plt.show()
 
 # computes a linear decision boundary by creating a training and test data
@@ -298,8 +298,8 @@ def problem_3_a_b_c():
         x_value_list.append(i)
 
         if model_result[0] < .05:
-            i = 5000
-        if i == 5 or i == 3000 or i == 5000:
+            i = 4999
+        if i == 5 or i == 3000 or i == 4999:
             plt.plot(x_value_list, mean_squared_error_list)
             plt.xlabel("Number trials so far")
             plt.ylabel("Mean Squared Errors")
@@ -309,7 +309,7 @@ def problem_3_a_b_c():
             elif i == 3000:
                 plt.title("Mean Squared Error After 3000 trials")
             else:
-                plt.title("Mean Squared Error After 5000 trials")
+                plt.title("Mean Squared Error After 4999 trials")
 
             plt.show()
 
@@ -321,7 +321,7 @@ def problem_3_a_b_c():
             elif i == 3000:
                 problem_1_a("4_c_3000", line_x_coords, line_y_coords)
             else:
-                problem_1_a("4_c_5000", line_x_coords, line_y_coords)
+                problem_1_a("4_c_4999", line_x_coords, line_y_coords)
 
 #follows the tutorial to use a library to train a neural network
 def problem_4_a():

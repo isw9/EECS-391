@@ -297,7 +297,9 @@ def problem_3_a_b_c():
         mean_squared_error_list.append(model_result[0])
         x_value_list.append(i)
 
-        if i == 5 or i == 3000 or i == 4995:
+        if model_result[0] < .05:
+            i = 5000
+        if i == 5 or i == 3000 or i == 5000:
             plt.plot(x_value_list, mean_squared_error_list)
             plt.xlabel("Number trials so far")
             plt.ylabel("Mean Squared Errors")

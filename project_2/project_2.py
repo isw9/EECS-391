@@ -11,6 +11,7 @@ from array import array
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from random import randint
 
 def modelNN(input_dimension):
     model = Sequential()
@@ -22,33 +23,31 @@ def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
 def get_line_coords(weight_one, weight_two, bias):
-    x = -bias / weight_one
-    y = -bias / weight_two
-    d = y
-    c = -y / x
-    line_x_coords = [0, x]
     line_y_coords = []
-    for i in range(2):
-        line_y_coords.append(c * line_x_coords[i] + d)
+    line_x_coords = [1, 2, 3, 4, 5, 6, 7, 8]
+    slope = -weight_one / weight_two
+    y_intercept = -bias / weight_two
+
+    for i in range(8):
+        line_y_coords.append(slope * line_x_coords[i] + y_intercept)
 
     result_coords = [line_x_coords, line_y_coords]
     return result_coords
 
 def derivativeSigmoid(z):
-    #sigmoid_result = sigmoid(z)
     return z * (1 - z)
 
 def mean_squared_error(dataset, target, weight_one, weight_two, bias, learning_rate):
 
     squared_error_running_total = 0.0
     squared_error_normalized = 0.0
-    weight_one_update = 0.0
-    weight_two_update = 0.0
-    bias_update = 0.0
+    weight_one_update = 0
+    weight_two_update = 0
+    bias_update = 0
 
     size = len(dataset)
     for i in range(size):
-        z = dataset[i][0]* weight_one + dataset[i][1] * weight_two + bias
+        z = (dataset[i][0] * weight_one) + (dataset[i][1] * weight_two) + bias
         sigmoid_result = sigmoid(z)
         derivative_result = derivativeSigmoid(sigmoid_result)
         if (target[i] == 'versicolor'):
@@ -57,15 +56,15 @@ def mean_squared_error(dataset, target, weight_one, weight_two, bias, learning_r
             actual_class = 1
 
         err_result = (sigmoid_result - actual_class)
-        weight_one_update = weight_one_update + (err_result * derivative_result * dataset[i][0])
-        weight_two_update = weight_two_update + (err_result * derivative_result * dataset[i][1])
-        bias_update = bias_update + (err_result * derivative_result)
         squared_error_result = err_result ** 2
+        weight_one_update += (err_result * derivative_result) * dataset[i][0]
+        weight_two_update += (err_result * derivative_result) * dataset[i][1]
+        bias_update += (err_result * derivative_result)
         squared_error_running_total += squared_error_result
 
-    new_weight_one = weight_one - (learning_rate * weight_one_update)
-    new_weight_two = weight_two - (learning_rate * weight_two_update)
-    new_bias = bias - (learning_rate * bias)
+    new_weight_one = weight_one - learning_rate * weight_one_update
+    new_weight_two = weight_two - learning_rate * weight_two_update
+    new_bias = bias - learning_rate * bias_update
 
     squared_error_normalized = (squared_error_running_total / size)
     return_array = [squared_error_normalized, new_weight_one, new_weight_two, new_bias]
@@ -80,6 +79,8 @@ def problem_1_a(problem_letter, x_coords_line, y_coords_line):
         species_df = data[data['species'] == species[i]]
         plt.scatter(species_df['petal_length'],species_df['petal_width'],color=colors[i-1])
 
+    plt.xlim(0, 10)
+    plt.ylim(0, 6)
     plt.xlabel('petal length (cm)')
     plt.ylabel('petal width (cm)')
     plt.title('Petal Width vs Petal Length - Problem #1(A)')
@@ -92,7 +93,15 @@ def problem_1_a(problem_letter, x_coords_line, y_coords_line):
     elif (problem_letter == '2_e_end'):
         plt.plot(x_coords_line, y_coords_line)
         plt.title("Petal Width vs Petal Length - Problem #2(E) after small step")
-
+    elif (problem_letter == '4_c_5'):
+        plt.plot(x_coords_line, y_coords_line)
+        plt.title("Petal Width vs Petal Length - Problem #2(E) after 5 trials")
+    elif (problem_letter == '4_c_3000'):
+        plt.plot(x_coords_line, y_coords_line)
+        plt.title("Petal Width vs Petal Length - Problem #2(E) after 3000 trials")
+    elif (problem_letter == '4_c_4995'):
+        plt.plot(x_coords_line, y_coords_line)
+        plt.title("Petal Width vs Petal Length - Problem #3(C) after 4995 trials")
     plt.show()
 
 def problem_1_b(problem_letter):
@@ -168,6 +177,7 @@ def problem_1_c(weight_one, weight_two, bias):
     line_coords = get_line_coords(weight_one, weight_two, bias)
     line_x_coords = line_coords[0]
     line_y_coords = line_coords[1]
+
     problem_1_a('c', line_x_coords, line_y_coords)
 
 def problem_1_d(dataset, target, weight_one, weight_two, bias):
@@ -237,6 +247,49 @@ def problem_2_e():
     line_y_coords = line_coords[1]
     problem_1_a("2_e_end", line_x_coords, line_y_coords)
 
+#implements gradient descent with random weights and bias
+def problem_3_a_b_c():
+    dataset = data.iloc[50:, [2,3]].values
+    target = data.iloc[50:, 4].values
+    weight_one = random.random()
+    weight_two = random.random()
+    bias = -random.random()
+    bias_multiplier = randint(1, 4)
+    bias = bias * bias_multiplier
+
+    mean_squared_error_list = []
+    x_value_list = []
+    for i in range(5000):
+        model_result = mean_squared_error(dataset, target, weight_one, weight_two, bias, .001)
+        weight_one = model_result[1]
+        weight_two = model_result[2]
+        bias = model_result[3]
+        mean_squared_error_list.append(model_result[0])
+        x_value_list.append(i)
+
+        if i == 5 or i == 3000 or i == 4995:
+            plt.plot(x_value_list, mean_squared_error_list)
+            plt.xlabel("Number trials so far")
+            plt.ylabel("Mean Squared Errors")
+
+            if i == 5:
+                plt.title("Mean Squared Error After 5 trials")
+            elif i == 3000:
+                plt.title("Mean Squared Error After 3000 trials")
+            else:
+                plt.title("Mean Squared Error After 4995 trials")
+
+            plt.show()
+
+            line_coords = get_line_coords(weight_one, weight_two, bias)
+            line_x_coords = line_coords[0]
+            line_y_coords = line_coords[1]
+            if i == 5:
+                problem_1_a("4_c_5", line_x_coords, line_y_coords)
+            elif i == 3000:
+                problem_1_a("4_c_3000", line_x_coords, line_y_coords)
+            else:
+                problem_1_a("4_c_4995", line_x_coords, line_y_coords)
 
 def problem_4_a():
     encodeOutput = []
@@ -276,6 +329,7 @@ if __name__ == "__main__":
     problem_1_e()
     problem_2_b()
     problem_2_e()
+    problem_3_a_b_c()
     input("Enter an integer to continue. I stopped here so you can look at my terminal results to problems 1, 2, and 3 before problem 4 completely fills up the screen ")
     problem_4_a()
     problem_4_b()
